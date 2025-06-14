@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditoSys - Nueva Solicitud</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <div>
+                    <h1>CreditoSys</h1>
+                    <small>Sistema de Gestión de Créditos</small>
+                </div>
+            </div>
+            <div class="user-info">
+                <div>
+                    <strong id="userName">Cargando...</strong>
+                    <br>
+                    <small id="userRole">Usuario</small>
+                </div>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="d-flex gap-1">
+                    <a href="dashboard.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a href="solicitudes.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-list"></i> Mis Solicitudes
+                    </a>
+                    <button class="btn btn-secondary btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Steps -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-between align-center">
+                    <div class="d-flex align-center gap-1">
+                        <div class="badge" style="background: var(--primary-gradient); color: white; padding: 8px 15px; border-radius: 20px;">
+                            <i class="fas fa-user"></i> 1. Datos Personales
+                        </div>
+                        <div style="width: 50px; height: 2px; background: var(--border-color);"></div>
+                        <div class="badge" style="background: var(--border-color); color: #666; padding: 8px 15px; border-radius: 20px;">
+                            <i class="fas fa-money-bill"></i> 2. Datos del Crédito
+                        </div>
+                        <div style="width: 50px; height: 2px; background: var(--border-color);"></div>
+                        <div class="badge" style="background: var(--border-color); color: #666; padding: 8px 15px; border-radius: 20px;">
+                            <i class="fas fa-file-upload"></i> 3. Documentos
+                        </div>
+                        <div style="width: 50px; height: 2px; background: var(--border-color);"></div>
+                        <div class="badge" style="background: var(--border-color); color: #666; padding: 8px 15px; border-radius: 20px;">
+                            <i class="fas fa-check"></i> 4. Confirmación
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge" style="background: rgba(102, 126, 234, 0.1); color: var(--primary-color); padding: 5px 10px;">
+                            Paso 1 de 4
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-plus-circle"></i> Nueva Solicitud de Crédito</h2>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-outline btn-sm" onclick="guardarBorrador()">
+                        <i class="fas fa-save"></i> Guardar Borrador
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="limpiarFormulario()">
+                        <i class="fas fa-eraser"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form id="formNuevaSolicitud" onsubmit="procesarSolicitud(event)">
+                    
+                    <!-- Paso 1: Datos Personales -->
+                    <div id="paso1" class="form-step active">
+                        <h3 class="mb-3"><i class="fas fa-user"></i> Información Personal</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nombres Completos</label>
+                                <input type="text" class="form-input" id="nombres" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Apellidos Completos</label>
+                                <input type="text" class="form-input" id="apellidos" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">DNI</label>
+                                <input type="text" class="form-input" id="dni" pattern="[0-9]{8}" maxlength="8" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fecha de Nacimiento</label>
+                                <input type="date" class="form-input" id="fechaNacimiento" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-input" id="telefono" pattern="[0-9]{9}" maxlength="9" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Dirección Completa</label>
+                            <textarea class="form-input" id="direccion" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Estado Civil</label>
+                                <select class="form-select" id="estadoCivil" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="soltero">Soltero(a)</option>
+                                    <option value="casado">Casado(a)</option>
+                                    <option value="divorciado">Divorciado(a)</option>
+                                    <option value="viudo">Viudo(a)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Número de Dependientes</label>
+                                <input type="number" class="form-input" id="dependientes" min="0" max="10" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Datos del Crédito -->
+                    <div id="paso2" class="form-step" style="display: none;">
+                        <h3 class="mb-3"><i class="fas fa-money-bill"></i> Información del Crédito</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Monto Solicitado (S/)</label>
+                                <input type="number" class="form-input" id="montoSolicitado" min="1000" max="1000000" required>
+                                <small>Monto mínimo: S/ 1,000 - Máximo: S/ 1,000,000</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Plazo (meses)</label>
+                                <select class="form-select" id="plazoMeses" required>
+                                    <option value="">Seleccionar plazo</option>
+                                    <option value="6">6 meses</option>
+                                    <option value="12">12 meses</option>
+                                    <option value="18">18 meses</option>
+                                    <option value="24">24 meses</option>
+                                    <option value="36">36 meses</option>
+                                    <option value="48">48 meses</option>
+                                    <option value="60">60 meses</option>
+                                    <option value="72">72 meses</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Propósito del Crédito</label>
+                                <select class="form-select" id="proposito" required>
+                                    <option value="">Seleccionar propósito</option>
+                                    <option value="vivienda">Vivienda</option>
+                                    <option value="vehiculo">Vehículo</option>
+                                    <option value="educacion">Educación</option>
+                                    <option value="negocio">Negocio</option>
+                                    <option value="personal">Personal</option>
+                                    <option value="consolidacion">Consolidación de deudas</option>
+                                    <option value="medical">Gastos médicos</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ingresos Mensuales (S/)</label>
+                                <input type="number" class="form-input" id="ingresosMensuales" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Trabajo</label>
+                                <select class="form-select" id="tipoTrabajo" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="dependiente">Empleado dependiente</option>
+                                    <option value="independiente">Trabajador independiente</option>
+                                    <option value="empresario">Empresario</option>
+                                    <option value="jubilado">Jubilado</option>
+                                    <option value="estudiante">Estudiante</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Empresa/Empleador</label>
+                                <input type="text" class="form-input" id="empresa" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Descripción Adicional</label>
+                            <textarea class="form-input" id="descripcion" rows="4" placeholder="Información adicional sobre tu solicitud"></textarea>
+                        </div>
+
+                        <!-- Simulation Card -->
+                        <div class="card" style="background: rgba(102, 126, 234, 0.05); border: 2px solid rgba(102, 126, 234, 0.2); margin-top: 20px;">
+                            <div class="card-body">
+                                <h4><i class="fas fa-calculator"></i> Simulación de Cuota</h4>
+                                <div id="simulacionCuota">
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <p><strong>Cuota mensual estimada:</strong></p>
+                                            <h3 id="cuotaEstimada" style="color: var(--primary-color);">-</h3>
+                                        </div>
+                                        <div class="col">
+                                            <p><strong>Total a pagar:</strong></p>
+                                            <h3 id="totalPagar" style="color: var(--secondary-color);">-</h3>
+                                        </div>
+                                    </div>
+                                    <p><strong>Tasa de interés estimada:</strong> <span id="tasaEstimada">12.5% anual</span></p>
+                                    <small>*Los valores son referenciales y pueden variar según la evaluación crediticia.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Documentos -->
+                    <div id="paso3" class="form-step" style="display: none;">
+                        <h3 class="mb-3"><i class="fas fa-file-upload"></i> Documentos Requeridos</h3>
+                        
+                        <div class="row">
+                            <div class="col-2">
+                                <h4>Documentos Obligatorios</h4>
+                                
+                                <!-- DNI -->
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5><i class="fas fa-id-card"></i> DNI</h5>
+                                        <p>Documento Nacional de Identidad (ambas caras)</p>
+                                        <div class="file-upload" onclick="document.getElementById('fileInputDNI').click()">
+                                            <i class="fas fa-upload"></i>
+                                            <p>Subir DNI</p>
+                                            <input type="file" id="fileInputDNI" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileUpload(this, 'dni')">
+                                        </div>
+                                        <div id="statusDNI" class="mt-2"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Recibo de Sueldo -->
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5><i class="fas fa-receipt"></i> Recibo de Sueldo</h5>
+                                        <p>Últimos 3 recibos de sueldo</p>
+                                        <div class="file-upload" onclick="document.getElementById('fileInputSueldo').click()">
+                                            <i class="fas fa-upload"></i>
+                                            <p>Subir Recibos</p>
+                                            <input type="file" id="fileInputSueldo" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;" onchange="handleFileUpload(this, 'sueldo')">
+                                        </div>
+                                        <div id="statusSueldo" class="mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <h4>Documentos Adicionales</h4>
+                                
+                                <!-- Estado de Cuenta -->
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5><i class="fas fa-bank"></i> Estado de Cuenta</h5>
+                                        <p>Últimos 3 meses</p>
+                                        <div class="file-upload" onclick="document.getElementById('fileInputCuenta').click()">
+                                            <i class="fas fa-upload"></i>
+                                            <p>Subir Estados</p>
+                                            <input type="file" id="fileInputCuenta" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'cuenta')">
+                                        </div>
+                                        <div id="statusCuenta" class="mt-2"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Otros Documentos -->
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5><i class="fas fa-file"></i> Otros</h5>
+                                        <p>Documentos adicionales de respaldo</p>
+                                        <div class="file-upload" onclick="document.getElementById('fileInputOtros').click()">
+                                            <i class="fas fa-upload"></i>
+                                            <p>Subir Otros</p>
+                                            <input type="file" id="fileInputOtros" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;" onchange="handleFileUpload(this, 'otros')">
+                                        </div>
+                                        <div id="statusOtros" class="mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3" style="background: rgba(255, 193, 7, 0.1); border: 2px solid rgba(255, 193, 7, 0.3);">
+                            <div class="card-body">
+                                <h4><i class="fas fa-info-circle"></i> Importante</h4>
+                                <ul>
+                                    <li>Los documentos deben estar en formato PDF, JPG o PNG</li>
+                                    <li>El tamaño máximo por archivo es de 50MB</li>
+                                    <li>Asegúrate de que los documentos sean legibles</li>
+                                    <li>Los documentos obligatorios son requeridos para procesar tu solicitud</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4: Confirmación -->
+                    <div id="paso4" class="form-step" style="display: none;">
+                        <h3 class="mb-3"><i class="fas fa-check"></i> Confirmación de Solicitud</h3>
+                        
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Resumen de Datos Personales</h4>
+                                    </div>
+                                    <div class="card-body" id="resumenPersonal">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Resumen del Crédito</h4>
+                                    </div>
+                                    <div class="card-body" id="resumenCredito">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h4>Documentos Subidos</h4>
+                            </div>
+                            <div class="card-body" id="resumenDocumentos">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </div>
+
+                        <div class="card mt-3" style="background: rgba(40, 167, 69, 0.1); border: 2px solid rgba(40, 167, 69, 0.3);">
+                            <div class="card-body">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" class="checkbox" id="aceptoTerminos" required>
+                                    <label class="checkbox-label" for="aceptoTerminos">
+                                        Acepto los <a href="#" onclick="mostrarTerminos()">términos y condiciones</a> del servicio y autorizo el procesamiento de mis datos personales
+                                    </label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" class="checkbox" id="aceptoEvaluacion" required>
+                                    <label class="checkbox-label" for="aceptoEvaluacion">
+                                        Autorizo la evaluación de mi información crediticia en las centrales de riesgo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-between mt-3">
+                        <button type="button" class="btn btn-secondary" id="btnAnterior" onclick="anteriorPaso()" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <div></div>
+                        <button type="button" class="btn btn-primary" id="btnSiguiente" onclick="siguientePaso()">
+                            Siguiente <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="submit" class="btn btn-success btn-lg" id="btnEnviar" style="display: none;">
+                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Variables para el formulario multi-paso
+        let pasoActual = 1;
+        const totalPasos = 4;
+        let archivosSubidos = {};
+
+        // Funciones de navegación entre pasos
+        function siguientePaso() {
+            if (validarPaso(pasoActual)) {
+                if (pasoActual < totalPasos) {
+                    pasoActual++;
+                    mostrarPaso(pasoActual);
+                    actualizarProgreso();
+                }
+            }
+        }
+
+        function anteriorPaso() {
+            if (pasoActual > 1) {
+                pasoActual--;
+                mostrarPaso(pasoActual);
+                actualizarProgreso();
+            }
+        }
+
+        function mostrarPaso(paso) {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.style.display = 'none';
+            });
+            
+            // Mostrar paso actual
+            document.getElementById(`paso${paso}`).style.display = 'block';
+            
+            // Actualizar botones
+            const btnAnterior = document.getElementById('btnAnterior');
+            const btnSiguiente = document.getElementById('btnSiguiente');
+            const btnEnviar = document.getElementById('btnEnviar');
+            
+            btnAnterior.style.display = paso > 1 ? 'block' : 'none';
+            btnSiguiente.style.display = paso < totalPasos ? 'block' : 'none';
+            btnEnviar.style.display = paso === totalPasos ? 'block' : 'none';
+            
+            // Si es el paso de confirmación, llenar resúmenes
+            if (paso === 4) {
+                llenarResumen();
+            }
+        }
+
+        function actualizarProgreso() {
+            // Actualizar indicador de progreso visual
+            const badges = document.querySelectorAll('.badge');
+            badges.forEach((badge, index) => {
+                if (index + 1 <= pasoActual) {
+                    badge.style.background = 'var(--primary-gradient)';
+                    badge.style.color = 'white';
+                } else {
+                    badge.style.background = 'var(--border-color)';
+                    badge.style.color = '#666';
+                }
+            });
+            
+            // Actualizar contador
+            document.querySelector('.badge').nextElementSibling.textContent = `Paso ${pasoActual} de ${totalPasos}`;
+        }
+
+        function validarPaso(paso) {
+            let valido = true;
+            
+            switch(paso) {
+                case 1:
+                    const camposRequeridos = ['nombres', 'apellidos', 'dni', 'fechaNacimiento', 'telefono', 'email', 'direccion', 'estadoCivil'];
+                    camposRequeridos.forEach(campo => {
+                        const input = document.getElementById(campo);
+                        if (!input.value.trim()) {
+                            input.style.borderColor = 'var(--error-color)';
+                            valido = false;
+                        } else {
+                            input.style.borderColor = 'var(--success-color)';
+                        }
+                    });
+                    break;
+                    
+                case 2:
+                    const camposCredito = ['montoSolicitado', 'plazoMeses', 'proposito', 'ingresosMensuales', 'tipoTrabajo', 'empresa'];
+                    camposCredito.forEach(campo => {
+                        const input = document.getElementById(campo);
+                        if (!input.value.trim()) {
+                            input.style.borderColor = 'var(--error-color)';
+                            valido = false;
+                        } else {
+                            input.style.borderColor = 'var(--success-color)';
+                        }
+                    });
+                    break;
+                    
+                case 3:
+                    if (!archivosSubidos.dni || !archivosSubidos.sueldo) {
+                        showNotification('Debes subir al menos DNI y recibos de sueldo', 'error');
+                        valido = false;
+                    }
+                    break;
+            }
+            
+            if (!valido) {
+                showNotification('Por favor completa todos los campos requeridos', 'error');
+            }
+            
+            return valido;
+        }
+
+        function handleFileUpload(input, tipo) {
+            const files = input.files;
+            if (files.length > 0) {
+                archivosSubidos[tipo] = Array.from(files);
+                actualizarEstadoArchivo(tipo, files.length);
+                showNotification(`${files.length} archivo(s) subido(s) para ${tipo}`, 'success');
+            }
+        }
+
+        function actualizarEstadoArchivo(tipo, cantidad) {
+            const statusElement = document.getElementById(`status${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="badge status-aprobada">
+                        <i class="fas fa-check"></i> ${cantidad} archivo(s) subido(s)
+                    </div>
+                `;
+            }
+        }
+
+        function llenarResumen() {
+            // Resumen personal
+            const resumenPersonal = document.getElementById('resumenPersonal');
+            resumenPersonal.innerHTML = `
+                <p><strong>Nombre:</strong> ${document.getElementById('nombres').value} ${document.getElementById('apellidos').value}</p>
+                <p><strong>DNI:</strong> ${document.getElementById('dni').value}</p>
+                <p><strong>Email:</strong> ${document.getElementById('email').value}</p>
+                <p><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</p>
+                <p><strong>Estado Civil:</strong> ${document.getElementById('estadoCivil').value}</p>
+            `;
+            
+            // Resumen crédito
+            const resumenCredito = document.getElementById('resumenCredito');
+            const monto = document.getElementById('montoSolicitado').value;
+            const plazo = document.getElementById('plazoMeses').value;
+            resumenCredito.innerHTML = `
+                <p><strong>Monto:</strong> S/ ${parseInt(monto).toLocaleString()}</p>
+                <p><strong>Plazo:</strong> ${plazo} meses</p>
+                <p><strong>Propósito:</strong> ${document.getElementById('proposito').value}</p>
+                <p><strong>Ingresos:</strong> S/ ${parseInt(document.getElementById('ingresosMensuales').value).toLocaleString()}</p>
+                <p><strong>Cuota Estimada:</strong> ${document.getElementById('cuotaEstimada').textContent}</p>
+            `;
+            
+            // Resumen documentos
+            const resumenDocumentos = document.getElementById('resumenDocumentos');
+            let listaDocumentos = '';
+            Object.keys(archivosSubidos).forEach(tipo => {
+                listaDocumentos += `<p><i class="fas fa-file"></i> ${tipo.toUpperCase()}: ${archivosSubidos[tipo].length} archivo(s)</p>`;
+            });
+            resumenDocumentos.innerHTML = listaDocumentos || '<p>No se han subido documentos</p>';
+        }
+
+        function procesarSolicitud(event) {
+            event.preventDefault();
+            
+            if (!document.getElementById('aceptoTerminos').checked) {
+                showNotification('Debes aceptar los términos y condiciones', 'error');
+                return;
+            }
+            
+            if (!document.getElementById('aceptoEvaluacion').checked) {
+                showNotification('Debes autorizar la evaluación crediticia', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            // Simular envío
+            setTimeout(() => {
+                hideLoading();
+                showNotification('¡Solicitud enviada exitosamente!', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            }, 3000);
+        }
+
+        function calcularCuotaEstimada() {
+            const monto = document.getElementById('montoSolicitado').value;
+            const plazo = document.getElementById('plazoMeses').value;
+            const cuotaEstimada = document.getElementById('cuotaEstimada');
+            const totalPagar = document.getElementById('totalPagar');
+            
+            if (monto && plazo && cuotaEstimada) {
+                const tasaAnual = 0.125; // 12.5%
+                const tasaMensual = tasaAnual / 12;
+                const montoNum = parseFloat(monto);
+                const plazoNum = parseInt(plazo);
+                
+                const cuota = montoNum * (tasaMensual * Math.pow(1 + tasaMensual, plazoNum)) / 
+                             (Math.pow(1 + tasaMensual, plazoNum) - 1);
+                
+                cuotaEstimada.textContent = `S/ ${cuota.toFixed(2)}`;
+                if (totalPagar) {
+                    totalPagar.textContent = `S/ ${(cuota * plazoNum).toFixed(2)}`;
+                }
+            }
+        }
+
+        function guardarBorrador() {
+            const datosFormulario = {
+                nombres: document.getElementById('nombres').value,
+                apellidos: document.getElementById('apellidos').value,
+                dni: document.getElementById('dni').value,
+                // ... otros campos
+            };
+            
+            localStorage.setItem('borrador_solicitud', JSON.stringify(datosFormulario));
+            showNotification('Borrador guardado exitosamente', 'success');
+        }
+
+        function limpiarFormulario() {
+            if (confirm('¿Estás seguro de limpiar todo el formulario?')) {
+                document.getElementById('formNuevaSolicitud').reset();
+                archivosSubidos = {};
+                pasoActual = 1;
+                mostrarPaso(1);
+                actualizarProgreso();
+                showNotification('Formulario limpiado', 'info');
+            }
+        }
+
+        function mostrarTerminos() {
+            showNotification('Términos y condiciones - En desarrollo', 'info');
+        }
+
+        // Función personalizada de logout para esta página
+        function logout() {
+            localStorage.removeItem('currentUser');
+            showNotification('Sesión cerrada exitosamente', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+
+        // Event listeners para cálculo automático
+        document.getElementById('montoSolicitado').addEventListener('input', calcularCuotaEstimada);
+        document.getElementById('plazoMeses').addEventListener('change', calcularCuotaEstimada);
+
+        // Inicializar
+        window.addEventListener('load', function() {
+            mostrarPaso(1);
+            actualizarProgreso();
+            loadUserData(); // Cargar datos del usuario
+        });
+    </script>
+</body>
+</html>
