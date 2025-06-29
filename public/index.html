@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditoSys - Sistema de Gestión de Créditos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText">Mensaje de notificación</span>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = app.checkAuth();
+            if (user) {
+                // Redirigir según el tipo de usuario
+                if (user.tipo_usuario === 'admin') {
+                    window.location.href = '/admin';
+                } else if (user.tipo_usuario === 'evaluador') {
+                    window.location.href = '/evaluacion';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            } else {
+                // Si no está autenticado, redirigir al login
+                window.location.href = '/login';
+            }
+        });
+    </script>
+</body>
+</html>

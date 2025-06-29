@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Créditos - CreditoSys</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <h1>CreditoSys</h1>
+                    <small>Sistema de Gestión de Créditos</small>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">
+                    <span>EV</span>
+                </div>
+                <div>
+                    <div id="userName">Evaluador</div>
+                    <div id="userRole">Evaluador de Créditos</div>
+                </div>
+                <button class="btn btn-outline" id="btnLogoutEvaluacion">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab" onclick="window.location.href='/dashboard'">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </button>
+            <button class="nav-tab active" onclick="window.location.href='/evaluacion'">
+                <i class="fas fa-search"></i>
+                Evaluación
+            </button>
+            <button class="nav-tab" onclick="window.location.href='/solicitudes'">
+                <i class="fas fa-file-alt"></i>
+                Solicitudes
+            </button>
+            <button class="nav-tab" onclick="window.location.href='/reportes'">
+                <i class="fas fa-chart-bar"></i>
+                Reportes
+            </button>
+        </nav>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number" id="evaluacionesPendientes">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number" id="evaluacionesCompletadas">0</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-number" id="scorePromedio">0</div>
+                <div class="stat-label">Score Promedio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-number" id="evaluacionesEsteMes">0</div>
+                <div class="stat-label">Este Mes</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Solicitudes Pendientes -->
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> Solicitudes Pendientes</h3>
+                        <button class="btn btn-primary btn-sm" data-action="cargarSolicitudesPendientes">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Solicitante</th>
+                                        <th>Monto</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="solicitudesPendientesTable">
+                                    <!-- Se llena dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluación Actual -->
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-search"></i> Evaluación Actual</h3>
+                    </div>
+                    <div class="card-body" id="evaluacionActual">
+                        <div class="text-center">
+                            <i class="fas fa-search" style="font-size: 3em; color: var(--gray); margin-bottom: 20px;"></i>
+                            <p>Selecciona una solicitud para comenzar la evaluación</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluaciones Recientes -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Evaluaciones Recientes</h3>
+                <div>
+                    <button class="btn btn-outline btn-sm" data-action="exportarEvaluaciones">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Solicitante</th>
+                                <th>Fecha</th>
+                                <th>Score</th>
+                                <th>Recomendación</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evaluacionesRecientesTable">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Evaluación -->
+    <div id="evaluacionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-search"></i> Evaluación de Crédito</h3>
+                <button class="modal-close" data-action="cerrarModalEvaluacion">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formEvaluacion">
+                    <input type="hidden" id="evaluacionId">
+                    <input type="hidden" id="solicitudId">
+
+                    <!-- Información del Solicitante -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user"></i> Información del Solicitante</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nombre Completo</label>
+                                    <input type="text" id="solicitanteNombre" class="form-input" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">DNI</label>
+                                    <input type="text" id="solicitanteDNI" class="form-input" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="solicitanteEmail" class="form-input" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" id="solicitanteTelefono" class="form-input" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de la Solicitud -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-file-alt"></i> Detalles de la Solicitud</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Monto Solicitado</label>
+                                    <input type="text" id="montoSolicitado" class="form-input" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Plazo (meses)</label>
+                                    <input type="text" id="plazoSolicitado" class="form-input" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Propósito</label>
+                                <input type="text" id="propositoSolicitud" class="form-input" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Criterios de Evaluación -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-bar"></i> Criterios de Evaluación</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Capacidad de Pago</label>
+                                    <select id="capacidadPago" class="form-select" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="excelente">Excelente</option>
+                                        <option value="buena">Buena</option>
+                                        <option value="regular">Regular</option>
+                                        <option value="baja">Baja</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Historial Crediticio</label>
+                                    <select id="historialCrediticio" class="form-select" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="excelente">Excelente</option>
+                                        <option value="bueno">Bueno</option>
+                                        <option value="regular">Regular</option>
+                                        <option value="malo">Malo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Estabilidad Laboral</label>
+                                    <select id="estabilidadLaboral" class="form-select" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="alta">Alta</option>
+                                        <option value="media">Media</option>
+                                        <option value="baja">Baja</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Garantías</label>
+                                    <select id="garantias" class="form-select" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="excelentes">Excelentes</option>
+                                        <option value="buenas">Buenas</option>
+                                        <option value="regulares">Regulares</option>
+                                        <option value="ninguna">Ninguna</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nivel de Riesgo</label>
+                                <select id="riesgoCredito" class="form-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="bajo">Bajo</option>
+                                    <option value="medio">Medio</option>
+                                    <option value="alto">Alto</option>
+                                    <option value="muy_alto">Muy Alto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Score y Recomendación -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-calculator"></i> Score y Recomendación</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Score Crediticio</label>
+                                    <input type="number" id="scoreCrediticio" class="form-input" min="0" max="100" readonly>
+                                    <small class="text-muted">Se calcula automáticamente</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Recomendación</label>
+                                    <select id="recomendacion" class="form-select" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="aprobada">Aprobar</option>
+                                        <option value="rechazada">Rechazar</option>
+                                        <option value="condicionada">Aprobar Condicionada</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Comentarios Adicionales</label>
+                                <textarea id="comentariosEvaluacion" class="form-textarea" rows="4" placeholder="Ingresa comentarios adicionales sobre la evaluación..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <button type="button" class="btn btn-secondary" data-action="cerrarModalEvaluacion">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-outline" data-action="guardarBorradorEvaluacion">
+                                    <i class="fas fa-save"></i>
+                                    Guardar Borrador
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check"></i>
+                                    Completar Evaluación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Funciones específicas para la página de evaluación
+        
+        // Cargar solicitudes pendientes
+        async function cargarSolicitudesPendientes() {
+            try {
+                const response = await apiRequest('/solicitudes/pendientes/evaluacion');
+                const solicitudes = response.data;
+                
+                const tbody = document.getElementById('solicitudesPendientesTable');
+                tbody.innerHTML = '';
+
+                solicitudes.forEach(solicitud => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${solicitud.id.toString().padStart(3, '0')}</td>
+                        <td>${solicitud.nombre_completo}</td>
+                        <td>S/ ${parseFloat(solicitud.monto_solicitado).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" data-action="iniciarEvaluacion" data-solicitud-id="${solicitud.id}">
+                                <i class="fas fa-search"></i>
+                                Evaluar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar solicitudes pendientes:', error);
+                showNotification('Error al cargar solicitudes pendientes', 'error');
+            }
+        }
+
+        // Iniciar evaluación
+        async function iniciarEvaluacion(solicitudId) {
+            try {
+                showLoading();
+                
+                const response = await apiRequest(`/solicitudes/${solicitudId}/evaluar`, {
+                    method: 'POST'
+                });
+
+                showNotification('Evaluación iniciada exitosamente', 'success');
+                
+                // Cargar datos de la solicitud para el modal
+                await cargarDatosSolicitud(solicitudId);
+                
+                // Mostrar modal
+                document.getElementById('evaluacionModal').classList.add('active');
+                
+                // Actualizar listas
+                cargarSolicitudesPendientes();
+                cargarEvaluacionesRecientes();
+
+            } catch (error) {
+                console.error('Error al iniciar evaluación:', error);
+                showNotification(error.message || 'Error al iniciar evaluación', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Cargar datos de la solicitud
+        async function cargarDatosSolicitud(solicitudId) {
+            try {
+                const response = await apiRequest(`/solicitudes/${solicitudId}`);
+                const solicitud = response.data;
+
+                // Llenar información del solicitante
+                document.getElementById('solicitanteNombre').value = solicitud.nombre_completo;
+                document.getElementById('solicitanteDNI').value = solicitud.dni;
+                document.getElementById('solicitanteEmail').value = solicitud.email;
+                document.getElementById('solicitanteTelefono').value = solicitud.telefono;
+
+                // Llenar detalles de la solicitud
+                document.getElementById('montoSolicitado').value = `S/ ${parseFloat(solicitud.monto_solicitado).toLocaleString()}`;
+                document.getElementById('plazoSolicitado').value = `${solicitud.plazo_meses} meses`;
+                document.getElementById('propositoSolicitud').value = getPropositoText(solicitud.proposito);
+
+                // Guardar IDs
+                document.getElementById('solicitudId').value = solicitudId;
+
+            } catch (error) {
+                console.error('Error al cargar datos de la solicitud:', error);
+                showNotification('Error al cargar datos de la solicitud', 'error');
+            }
+        }
+
+        // Cargar evaluaciones recientes
+        async function cargarEvaluacionesRecientes() {
+            try {
+                const response = await apiRequest('/evaluaciones');
+                const evaluaciones = response.data;
+                
+                const tbody = document.getElementById('evaluacionesRecientesTable');
+                tbody.innerHTML = '';
+
+                evaluaciones.forEach(evaluacion => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${evaluacion.id.toString().padStart(3, '0')}</td>
+                        <td>${evaluacion.solicitante_nombre}</td>
+                        <td>${new Date(evaluacion.fecha_inicio).toLocaleDateString()}</td>
+                        <td>${evaluacion.score_crediticio || 'N/A'}</td>
+                        <td>${evaluacion.recomendacion || 'Pendiente'}</td>
+                        <td><span class="badge status-${evaluacion.estado}">${getEstadoEvaluacionText(evaluacion.estado)}</span></td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" data-action="verEvaluacion" data-evaluacion-id="${evaluacion.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar evaluaciones recientes:', error);
+                showNotification('Error al cargar evaluaciones recientes', 'error');
+            }
+        }
+
+        // Cargar estadísticas de evaluaciones
+        async function cargarEstadisticasEvaluaciones() {
+            try {
+                const response = await apiRequest('/evaluaciones/estadisticas');
+                const { estadisticas } = response.data;
+
+                document.getElementById('evaluacionesPendientes').textContent = estadisticas.en_proceso || 0;
+                document.getElementById('evaluacionesCompletadas').textContent = estadisticas.completadas || 0;
+                document.getElementById('scorePromedio').textContent = Math.round(estadisticas.score_promedio || 0);
+                document.getElementById('evaluacionesEsteMes').textContent = estadisticas.total || 0;
+
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+            }
+        }
+
+        // Cerrar modal de evaluación
+        function cerrarModalEvaluacion() {
+            document.getElementById('evaluacionModal').classList.remove('active');
+            document.getElementById('formEvaluacion').reset();
+        }
+
+        // Guardar borrador de evaluación
+        function guardarBorradorEvaluacion() {
+            showNotification('Borrador guardado', 'success');
+        }
+
+        // Ver evaluación
+        function verEvaluacion(id) {
+            showNotification(`Ver evaluación #${id}`, 'info');
+            // TODO: Implementar vista de evaluación
+        }
+
+        // Exportar evaluaciones
+        function exportarEvaluaciones() {
+            showNotification('Exportando evaluaciones...', 'info');
+            // TODO: Implementar exportación
+        }
+
+        // Obtener texto del estado de evaluación
+        function getEstadoEvaluacionText(estado) {
+            const estados = {
+                'en_proceso': 'En Proceso',
+                'completada': 'Completada',
+                'cancelada': 'Cancelada'
+            };
+            return estados[estado] || estado;
+        }
+
+        // Event listener para el formulario de evaluación
+        document.getElementById('formEvaluacion').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                showLoading();
+                
+                const formData = {
+                    capacidad_pago: document.getElementById('capacidadPago').value,
+                    historial_crediticio: document.getElementById('historialCrediticio').value,
+                    estabilidad_laboral: document.getElementById('estabilidadLaboral').value,
+                    garantias: document.getElementById('garantias').value,
+                    riesgo_credito: document.getElementById('riesgoCredito').value,
+                    recomendacion: document.getElementById('recomendacion').value,
+                    comentarios: document.getElementById('comentariosEvaluacion').value,
+                    estado: 'completada'
+                };
+
+                const evaluacionId = document.getElementById('evaluacionId').value;
+                const url = evaluacionId ? `/evaluaciones/${evaluacionId}` : '/evaluaciones';
+                const method = evaluacionId ? 'PUT' : 'POST';
+
+                const response = await apiRequest(url, {
+                    method: method,
+                    body: JSON.stringify(formData)
+                });
+
+                showNotification('Evaluación completada exitosamente', 'success');
+                cerrarModalEvaluacion();
+                
+                // Actualizar listas
+                cargarSolicitudesPendientes();
+                cargarEvaluacionesRecientes();
+                cargarEstadisticasEvaluaciones();
+
+            } catch (error) {
+                console.error('Error al completar evaluación:', error);
+                showNotification(error.message || 'Error al completar evaluación', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Calcular score automático cuando cambien los criterios
+        function calcularScoreAutomatico() {
+            const capacidadPago = document.getElementById('capacidadPago').value;
+            const historialCrediticio = document.getElementById('historialCrediticio').value;
+            const estabilidadLaboral = document.getElementById('estabilidadLaboral').value;
+            const garantias = document.getElementById('garantias').value;
+
+            if (capacidadPago && historialCrediticio && estabilidadLaboral && garantias) {
+                let score = 0;
+                
+                // Capacidad de pago (0-25 puntos)
+                if (capacidadPago === 'excelente') score += 25;
+                else if (capacidadPago === 'buena') score += 20;
+                else if (capacidadPago === 'regular') score += 15;
+                else if (capacidadPago === 'baja') score += 5;
+
+                // Historial crediticio (0-30 puntos)
+                if (historialCrediticio === 'excelente') score += 30;
+                else if (historialCrediticio === 'bueno') score += 25;
+                else if (historialCrediticio === 'regular') score += 15;
+                else if (historialCrediticio === 'malo') score += 0;
+
+                // Estabilidad laboral (0-25 puntos)
+                if (estabilidadLaboral === 'alta') score += 25;
+                else if (estabilidadLaboral === 'media') score += 15;
+                else if (estabilidadLaboral === 'baja') score += 5;
+
+                // Garantías (0-20 puntos)
+                if (garantias === 'excelentes') score += 20;
+                else if (garantias === 'buenas') score += 15;
+                else if (garantias === 'regulares') score += 10;
+                else if (garantias === 'ninguna') score += 0;
+
+                document.getElementById('scoreCrediticio').value = score;
+            }
+        }
+
+        // Event listeners para calcular score automático
+        document.getElementById('capacidadPago').addEventListener('change', calcularScoreAutomatico);
+        document.getElementById('historialCrediticio').addEventListener('change', calcularScoreAutomatico);
+        document.getElementById('estabilidadLaboral').addEventListener('change', calcularScoreAutomatico);
+        document.getElementById('garantias').addEventListener('change', calcularScoreAutomatico);
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarSolicitudesPendientes();
+            cargarEvaluacionesRecientes();
+            cargarEstadisticasEvaluaciones();
+        });
+    </script>
+</body>
+</html>
